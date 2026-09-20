@@ -1,5 +1,7 @@
 from time import time
 
+import numpy as np
+
 from HopfieldNetwork import HopfieldNetwork
 from image_processing import numpy_array_to_bmp, transform_images
 
