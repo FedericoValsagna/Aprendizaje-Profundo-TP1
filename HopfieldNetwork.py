@@ -2,36 +2,31 @@ from time import time
 
 import numpy as np
 
-CUTTING_CONDITION = 1200
+CUTTING_CONDITION = 2000  # Era 1200
 
 
 class HopfieldNetwork:
-    def __init__(self, xs):
+    def __init__(self, xs: list):
         self.Xs = xs
         self.N = len(xs)
         self.l = len(xs[0])
         self.W = np.zeros((self.l, self.l))
-        # print("W:", self.W)
-        # self.train()
-        
+
     def train(self):
-        
         print("Training Hopfield Network...")
         time_start = time()
-        for i in range(self.l):
-            for j in range(self.l):
-                if i != j:
-                    self.W[i][j] = sum([x[i] * x[j] for x in self.Xs])
-        
+
+        X = np.array(self.Xs)
+        self.W = (X.T @ X) / self.l
+        np.fill_diagonal(self.W, 0)
+
         time_end = time()
         print("Training complete.")
-        print(f"Training time: {time_end - time_start} seconds")   
+        print(f"Training time: {time_end - time_start} seconds")
         # print("W:", self.W)
-        
-    
-    def recall(self, x):
 
-        # print("Recalling image...")
+    def recall(self, x):
+        x = np.array(x, dtype=float)
         current_fixed = 0
         while True:
             index = np.random.randint(0, self.l)
@@ -42,15 +37,14 @@ class HopfieldNetwork:
                     break
                 continue
             else:
-                current_fixed = 0 
+                current_fixed = 0
         return x
-    
+
     def update_cell(self, x, index):
         cell_before = x[index]
-        x[index] = self.sign(sum(self.W[index][j] * x[j] for j in range(self.l) if j != index))
+        x[index] = self.sign(self.W[index] @ x)
         return x[index] == cell_before
-    
-    
+
     def sign(self, number):
         if number >= 0:
             return 1

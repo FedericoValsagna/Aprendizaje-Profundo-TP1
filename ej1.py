@@ -1,21 +1,16 @@
+import os
 from time import time
 
 import numpy as np
 
+import Hopfield2
 from HopfieldNetwork import HopfieldNetwork
 from image_processing import numpy_array_to_bmp, transform_images
 
-NOISE_PERCENTAGES = [5,10,15,20, 30, 40, 50, 60, 70, 80, 90, 95]
+NOISE_PERCENTAGES = [0, 0.1, 0.2, 0.5, 1, 2, 5, 10, 20, 30, 35, 37, 38, 39, 40, 50, 60, 70]
+OUTPUT_FOLDER = "./OutputEj1"
 
-def compare_images(expected, retrieved, time_start, time_end):
-    """
-    Compara el patrón esperado con el obtenido.
-    Imprime si son idénticos y el porcentaje de píxeles/valores en los que varían.
-    
-    Parameters:
-    expected  : array-like o np.ndarray original
-    retrieved : array-like o np.ndarray devuelto por la red
-    """
+def compare_images(expected, retrieved):
     exp = np.array(expected)
     ret = np.array(retrieved)
     
@@ -24,47 +19,39 @@ def compare_images(expected, retrieved, time_start, time_end):
     diff_percentage = (diff_count / total) * 100
     is_equal = diff_count == 0
     
-    print(f"Recalling image ended in {(time_end - time_start):.2f} seconds | Diferencias: {diff_count} de {total} valores ({diff_percentage:.2f}%)")  
-    
-    return is_equal, diff_percentage
+    return is_equal, diff_percentage, diff_count, total
 
-def add_noise(vector, noise_percentage):
-    """
-    Agrega ruido a un vector de valores (-1, 1) invirtiendo el signo de un porcentaje de sus elementos.
-    
-    Parameters:
-    vector           : array-like o np.ndarray original (con valores -1 y 1)
-    noise_percentage : float entre 0 y 100 (ej. 10 para 10% de ruido)
-    
-    Returns:
-    np.ndarray       : copia del vector original con ruido aplicado
-    """
+def add_noise(vector: list, noise_percentage: int):
     noisy_vector = np.array(vector).copy()
     total_elements = len(noisy_vector)
     
-    # Cantidad de elementos a invertir según el porcentaje
     num_to_flip = int(total_elements * (noise_percentage / 100))
-    
-    # Seleccionamos índices aleatorios sin repetición
     flip_indices = np.random.choice(total_elements, size=num_to_flip, replace=False)
-    
-    # Invertimos el signo (1 pasa a -1, -1 pasa a 1)
     noisy_vector[flip_indices] *= -1
     
     return noisy_vector
 
-def recall_all_images(Xs, noise_percetage, hopfield):
-    i = 0
-    for x in Xs:
+def recall_pattern(Xs: list, noise_percetage: float, hopfield: HopfieldNetwork, is_image: bool = False):
+    for i, x in enumerate(Xs):
         xn = add_noise(x, noise_percetage)
-        # compare_images(x, xn)
         time_start = time()
-        x = hopfield.recall(xn)
+        new_x = hopfield.recall(xn)
         time_end = time()
-        # numpy_array_to_bmp(x, f"Imagen {i}.bmp")
-        compare_images(xn, x, time_start, time_end)
-        i += 1
+        is_equal, diff_percentage, diff_count, total = compare_images(x, new_x)
+        print(f"Recalling image ended in {(time_end - time_start):.2f} seconds | Diferencias: {diff_count} de {total} valores ({diff_percentage:.2f}%)")
+        
+        if is_image:
+            is_image(xn, new_x, i, noise_percetage)
+        
+def save_image(xn, new_x, i, noise_percetage):
+    noisy_path = os.path.join(OUTPUT_FOLDER, f"img{i}_noise{noise_percetage}_ruidosa.bmp")
+    recalled_path = os.path.join(OUTPUT_FOLDER, f"img{i}_noise{noise_percetage}_recuperada.bmp")
+    numpy_array_to_bmp(xn, noisy_path)
+    numpy_array_to_bmp(new_x, recalled_path)
+    
+    
 def ej1():
+    print("Ejercicio 1")
     Xs = transform_images()
     hopfield = HopfieldNetwork(Xs)
     hopfield.train()
@@ -72,4 +59,5 @@ def ej1():
         print()
         print()
         print(f"Recalling images with {noise_percentage}% of noise")
-        recall_all_images(Xs, noise_percentage, hopfield)
+        recall_pattern(Xs, noise_percentage, hopfield, is_image=True)
+        print("All Images recalled. See errors above")
