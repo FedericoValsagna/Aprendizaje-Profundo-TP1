@@ -192,5 +192,5 @@ def ej1_ruido():
 
 def ej1():
     print("Ejercicio 1")
-    # ej1_ruido()
+    ej1_ruido()
     ej1_borrado()
