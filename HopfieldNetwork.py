@@ -21,7 +21,7 @@ class HopfieldNetwork:
         X = np.array(self.Xs)
         self.W = (X.T @ X) / self.l
         np.fill_diagonal(self.W, 0)
-        
+
         if self.verbose:
             time_end = time()
             print("Training complete.")
@@ -52,8 +52,10 @@ class HopfieldNetwork:
             return 1
         else:
             return -1
-        
-    def recall_con_energia(self, W: np.ndarray, x, cutting_condition: int = 2000, max_iter: int = 200000):
+
+    def recall_con_energia(
+        self, W: np.ndarray, x, cutting_condition: int = 2000, max_iter: int = 200000
+    ):
         x = np.array(x, dtype=float).copy()
         energias = [self.energia(W, x)]
         current_fixed = 0
@@ -72,6 +74,6 @@ class HopfieldNetwork:
                 current_fixed = 0
 
         return x, energias
-    
+
     def energia(self, W: np.ndarray, x: np.ndarray) -> float:
         return -0.5 * x @ W @ x

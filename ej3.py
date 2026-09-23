@@ -1,7 +1,11 @@
 import numpy as np
 from HopfieldNetwork import HopfieldNetwork
 from ej2 import generar_patrones, TABLA_PERROR
-from plots import plot_capacidad_vs_poda, plot_energia_vs_pasos, plot_error_vs_ruido_por_poda
+from plots import (
+    plot_capacidad_vs_poda,
+    plot_energia_vs_pasos,
+    plot_error_vs_ruido_por_poda,
+)
 from helper import add_noise, compare_images
 
 N = 1000
@@ -28,8 +32,13 @@ def podar_neuronas(W: np.ndarray, porcentaje: float) -> np.ndarray:
     return W_podada
 
 
-def evaluar_ruido_vs_poda(N: int, p: int, porcentajes_poda: list, noise_percentages: list,
-                           repeticiones: int = REPETICIONES_RUIDO):
+def evaluar_ruido_vs_poda(
+    N: int,
+    p: int,
+    porcentajes_poda: list,
+    noise_percentages: list,
+    repeticiones: int = REPETICIONES_RUIDO,
+):
 
     xs = generar_patrones(N, p)
     hopfield = HopfieldNetwork(xs)
@@ -50,12 +59,11 @@ def evaluar_ruido_vs_poda(N: int, p: int, porcentajes_poda: list, noise_percenta
                     errores.append(diff_pct)
             error_promedio = float(np.mean(errores))
             puntos.append((noise_pct, error_promedio))
-            print(f"p={p} poda={poda_pct}% ruido={noise_pct}% -> error promedio={error_promedio:.2f}%")
+            print(
+                f"p={p} poda={poda_pct}% ruido={noise_pct}% -> error promedio={error_promedio:.2f}%"
+            )
         resultados_por_poda[poda_pct] = puntos
     return resultados_por_poda
-
-
-
 
 
 def perror_sincronico_con_W(W: np.ndarray, xs: list) -> float:
@@ -69,8 +77,9 @@ def perror_sincronico_con_W(W: np.ndarray, xs: list) -> float:
     return np.mean(errores)
 
 
-def see_error_evolution(N: int, valores_p: list, porcentaje_poda: float,
-                                repeticiones: int = REPETITIONS):
+def see_error_evolution(
+    N: int, valores_p: list, porcentaje_poda: float, repeticiones: int = REPETITIONS
+):
     resultados = []
     for p in valores_p:
         errores_rep = []
@@ -97,8 +106,13 @@ def calculate_pmax(resultados, perror_target):
     return np.interp(perror_target, perror_sorted, p_sorted)
 
 
-def see_capacity_evolution(N: int, valores_p: list, porcentajes_poda: list,
-                             perror_target: float = 0.01, repeticiones: int = REPETITIONS):
+def see_capacity_evolution(
+    N: int,
+    valores_p: list,
+    porcentajes_poda: list,
+    perror_target: float = 0.01,
+    repeticiones: int = REPETITIONS,
+):
     resultados_capacidad = []
     for porcentaje in porcentajes_poda:
         print(f"\nMidiendo capacidad con {porcentaje}% de sinapsis eliminadas...")
@@ -106,22 +120,24 @@ def see_capacity_evolution(N: int, valores_p: list, porcentajes_poda: list,
         pmax = calculate_pmax(resultados_p, perror_target)
         pmax_sobre_n = pmax / N if not np.isnan(pmax) else np.nan
         resultados_capacidad.append((porcentaje, pmax_sobre_n))
-        print(f"poda={porcentaje}% -> pmax/N (Perror={perror_target}) = {pmax_sobre_n:.4f}")
+        print(
+            f"poda={porcentaje}% -> pmax/N (Perror={perror_target}) = {pmax_sobre_n:.4f}"
+        )
     return resultados_capacidad
-
-
-
 
 
 def ej3_1():
     n = 1000
     p = 100
     poda_levels_ruido = [0, 20, 40, 60, 80]
-    noise_percentages = range(2,50,2)
-    
+    noise_percentages = range(2, 50, 2)
+
     print(f"\n--- Error vs. ruido por poda, P grande (N={n}, p={p}) ---")
-    resultados_grande = evaluar_ruido_vs_poda(n, p, poda_levels_ruido, noise_percentages)
+    resultados_grande = evaluar_ruido_vs_poda(
+        n, p, poda_levels_ruido, noise_percentages
+    )
     plot_error_vs_ruido_por_poda(resultados_grande, p, N)
+
 
 def ej3_2():
     valores_p = list(range(50, 400, 25))
@@ -139,8 +155,7 @@ def ej3_3():
     p = 50
     noise_percentage = 20
     porcentajes_poda = [0, 20, 50, 80]
-    
-    
+
     print(f"Energía durante el recall asincrónico (N={N})")
     xs = generar_patrones(n, p)
     hopfield = HopfieldNetwork(xs)
@@ -154,7 +169,9 @@ def ej3_3():
         _, energias = hopfield.recall_con_energia(W_podada, xs.copy())
         etiqueta = "Red completa" if porcentaje == 0 else f"{porcentaje}% eliminado"
         curvas[etiqueta] = energias
-        print(f"{etiqueta}: energía inicial={energias[0]:.2f}, final={energias[-1]:.2f}, pasos={len(energias) - 1}")
+        print(
+            f"{etiqueta}: energía inicial={energias[0]:.2f}, final={energias[-1]:.2f}, pasos={len(energias) - 1}"
+        )
 
     plot_energia_vs_pasos(curvas)
 
