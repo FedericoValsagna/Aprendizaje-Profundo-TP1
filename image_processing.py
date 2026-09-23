@@ -56,3 +56,7 @@ def numpy_array_to_bmp(matriz, file_path, target_shape=TARGET_SIZE):
 
 def imagenes():
     return [file for file in os.listdir(FOLDERNAME) if file.lower().endswith(".bmp")]
+
+def image_name_from_id(id):
+    images = ["Perro", "Quijote""Torero", "Paloma", "Torero","Panda", "Anonymous"]
+    return images[id]

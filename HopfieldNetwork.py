@@ -6,24 +6,26 @@ CUTTING_CONDITION = 2000  # Era 1200
 
 
 class HopfieldNetwork:
-    def __init__(self, xs: list):
+    def __init__(self, xs: list, verbose=False):
         self.Xs = xs
         self.N = len(xs)
         self.l = len(xs[0])
         self.W = np.zeros((self.l, self.l))
+        self.verbose = verbose
 
     def train(self):
-        print("Training Hopfield Network...")
-        time_start = time()
+        if self.verbose:
+            print("Training Hopfield Network...")
+            time_start = time()
 
         X = np.array(self.Xs)
         self.W = (X.T @ X) / self.l
         np.fill_diagonal(self.W, 0)
-
-        time_end = time()
-        print("Training complete.")
-        print(f"Training time: {time_end - time_start} seconds")
-        # print("W:", self.W)
+        
+        if self.verbose:
+            time_end = time()
+            print("Training complete.")
+            print(f"Training time: {time_end - time_start} seconds")
 
     def recall(self, x):
         x = np.array(x, dtype=float)
@@ -50,3 +52,26 @@ class HopfieldNetwork:
             return 1
         else:
             return -1
+        
+    def recall_con_energia(self, W: np.ndarray, x, cutting_condition: int = 2000, max_iter: int = 200000):
+        x = np.array(x, dtype=float).copy()
+        energias = [self.energia(W, x)]
+        current_fixed = 0
+
+        while True:
+            index = np.random.randint(0, len(x))
+            before = x[index]
+            activacion = W[index] @ x
+            x[index] = 1 if activacion >= 0 else -1
+            energias.append(self.energia(W, x))
+            if x[index] == before:
+                current_fixed += 1
+                if current_fixed > cutting_condition:
+                    break
+            else:
+                current_fixed = 0
+
+        return x, energias
+    
+    def energia(self, W: np.ndarray, x: np.ndarray) -> float:
+        return -0.5 * x @ W @ x
