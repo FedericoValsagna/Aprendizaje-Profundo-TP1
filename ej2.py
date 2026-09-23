@@ -1,7 +1,6 @@
 import numpy as np
 from HopfieldNetwork import HopfieldNetwork
 from plots import (
-    plot_capacidad_vs_correlacion,
     plot_perror_vs_pN_correlaciones,
     plot_perror_vs_pN_tabla,
 )
