@@ -24,3 +24,16 @@ def compare_images(expected, retrieved):
     return is_equal, diff_percentage, diff_count, total
 
 
+def delete_last_percentage(vector: list, delete_percentage: float, fill_value: int = -1):
+    """
+    Borra (reemplaza por fill_value) el último delete_percentage% de los elementos
+    del vector, simulando una imagen con una porción faltante.
+    """
+    deleted_vector = np.array(vector).copy()
+    total_elements = len(deleted_vector)
+
+    num_to_delete = int(total_elements * (delete_percentage / 100))
+    if num_to_delete > 0:
+        deleted_vector[-num_to_delete:] = fill_value
+
+    return deleted_vector

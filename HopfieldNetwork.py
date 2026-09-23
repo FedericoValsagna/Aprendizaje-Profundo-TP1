@@ -2,7 +2,7 @@ from time import time
 
 import numpy as np
 
-CUTTING_CONDITION = 2000  # Era 1200
+CUTTING_CONDITION = 2000
 
 
 class HopfieldNetwork:

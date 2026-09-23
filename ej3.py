@@ -161,6 +161,6 @@ def ej3_3():
 
 def ej3():
     print("Ejercicio 3")
-    # ej3_1()
+    ej3_1()
     ej3_2()
-    # ej3_3()
+    ej3_3()
